@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+/*teste*/
 int main() {
   printf("Este programa verifica a posicao de um ponto (x,y) no plano cartesiano.\n\n");
   printf("Digite x: ");
