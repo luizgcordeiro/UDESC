@@ -96,12 +96,12 @@ divisao 2 n
   |((rem n 2) == 0) = True
   |otherwise = False
 divisao m n
-  |(rem m n)==0 = True
-  |otherwise = (rem (m-1) n)
+  |(rem n m)==0 = True
+  |otherwise = (divisao (m-1) n)
 
 primo :: Int -> Bool
 primo 0 = False
 primo 1 = True
 primo 2 = True
 primo n | (n<0) = primo (-n)
-primo n = not (divisao n-1 n)
+primo n = not (divisao (n-1) n)
