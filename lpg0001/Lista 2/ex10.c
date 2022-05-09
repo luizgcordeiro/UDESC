@@ -9,7 +9,8 @@
 */
 
 float soma_e_iterativa(int n) {
-  int i,soma=0;
+  int i;
+  float soma=0;
   float termo=1;
 
   for (i=0;i<=n;i++) {
@@ -28,5 +29,10 @@ float soma_e_recursiva(int n, int iter, float soma, float termo) {
     return soma;
   }
 
-  return termo +soma_e_recursiva(n,iter+1,soma+termo,termo/(iter+1));
+  return soma_e_recursiva(n,iter+1,soma+termo,termo/(iter+1));
+}
+
+int main() {
+  printf("%.15lf",soma_e_recursiva(400,0,0,1));
+  return 0;
 }
