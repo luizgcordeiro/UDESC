@@ -7,6 +7,9 @@ void inc_dec (int *a, int *b);//Exercicio 1
 void troca_valor(float *x, float *y);//Exercício 2
 void calcula_circulo(float raio, float *pPerimetro, float *pArea);//Exercício 3
 void cacula_hora(int totalMinutos, int *ph, int *pm);//Exercício 4
+void max_min(int vet[], int tam, int *pMin, int *pMax);//Exercício 5
+void max_vetor(float vet[], int tam, float *pMax, int *pIndice);//Exercício 6
+void min_matriz(float mat[3][4], float *pMin, int *pI, int *pJ);//Exercício 7
 
 int main() {
   printf("LISTA 5\n");
@@ -123,13 +126,54 @@ int main() {
       printf(".\n\n");
     }
     else if (num_ex==5) {
+      int v[10];
+      int tam,min,max;
+      printf("Qual o tamanho do vetor que voce quer criar (máximo 10)? ");
+      scanf("%d",&tam);
 
+      printf("Digite as entradas do vetor:\n\n");
+      int i;
+      for (i=0;i<tam;i++) {
+        printf("Entrada %d: ",i);
+        scanf("%d",v+i);
+      }
+
+      max_min(v,tam,&min,&max);
+
+      printf("\nO valor minimo do vetor e %d e o maximo e %d.\n",min,max);
     }
     else if (num_ex==6) {
+      float v[10],max;
+      int tam,indice;
+      printf("Qual o tamanho do vetor que voce quer criar (máximo 10)? ");
+      scanf("%d",&tam);
 
+      printf("Digite as entradas do vetor:\n\n");
+      int i;
+      for (i=0;i<tam;i++) {
+        printf("Entrada %d: ",i);
+        scanf("%f",v+i);
+      }
+
+      max_vetor(v,tam,&max,&indice);
+
+      printf("\nO valor maximo do vetor e %.4f, com indice %d.\n",max,indice);
     }
     else if (num_ex==7) {
+      float m[3][4],min;
+      int i,j,i_min,j_min;
 
+      printf("Digite as entradas da matriz 3x4:\n\n");
+      for (i=0;i<3;i++) {
+        for (j=0;j<4;j++) {
+          printf("Entrada (%d,%d): ",i,j);
+          scanf("%f",&m[i][j]);
+        }
+      }
+
+      min_matriz(m,&min,&i_min,&j_min);
+
+      printf("\nO valor minimo da matriz e %.4f, na entrada (i,j)=(%d,%d).\n",min,i_min,j_min);
     }
     printf("=============\n");
   }
@@ -190,6 +234,64 @@ void cacula_hora(int totalMinutos, int *ph, int *pm) {
   precisa “retornar” o maior e o menor valores do vetor.
 */
 
-void max_min(int vet[], int tam, int *pMin, int *pMax){
+void max_min(int vet[], int tam, int *pMin, int *pMax) {
+  int i;
+  *pMin=vet[0];
+  *pMax=vet[0];
+
+  for (i=1;i<tam;i++) {
+    if (*pMin>vet[i]) {
+      *pMin=vet[i];
+    }
+    if (*pMax<vet[i]) {
+      *pMax=vet[i];
+    }
+  }
+
+  return;
+}
+
+/*
+  6) Escreva um programa que determine o maior valor de um vetor bem como sua
+  posição no vetor (índice). Tal processamento deve ser feito em uma função que
+  recebe o vetor (do tipo float) e sua capacidade, e “retorna” o maior elemento
+  e sua posição.
+*/
+
+void max_vetor(float vet[], int tam, float *pMax, int *pIndice) {
+  int i;
+  *pMax=vet[0];
+  *pIndice=0;
+
+  for (i=1;i<tam;i++) {
+    if (*pMax<vet[i]) {
+      *pMax=vet[i];
+      *pIndice=i;
+    }
+  }
+  return;
+}
+
+/*
+  7) Faça um programa que determine o menor valor de uma matriz 3x4, bem como
+  suas coordenadas (linha e coluna). Tal processamento deve ser feito por uma
+  função que recebe a matriz e “retorna” o menor elemento e suas coordenadas
+  (i e j).
+*/
+void min_matriz(float mat[3][4], float *pMin, int *pI, int *pJ) {
+  *pMin=mat[0][0];
+  *pI=0;
+  *pJ=0;
+
+  int i,j;
+  for (i=1;i<3;i++) {
+    for (j=1;j<4;j++) {
+      if (mat[i][j]<(*pMin)) {
+        *pMin=mat[i][j];
+        *pI=i;
+        *pJ=j;
+      }
+    }
+  }
   return;
 }
