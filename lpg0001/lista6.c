@@ -14,7 +14,7 @@ float * maiorig_que (float * v,int n,float x);//Exercício 3.2
 int *uniao( int *v1, int n1, int *v2, int n2, int *p3 );//Exercício 5
 
 int main() {
-    printf("LISTA 5\n");
+    printf("LISTA 6\n");
     printf("\n");
     printf("=============\n");
 
