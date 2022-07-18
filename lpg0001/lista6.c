@@ -22,7 +22,7 @@ int main() {
     int num_ex=1;
     while (num_ex!=0) {
 
-        printf("Digite o numero do exercicio que voce quer testar (1 a 7)\n"
+        printf("Digite o numero do exercicio que voce quer testar (1 a 5)\n"
         "ou 0 para sair: ");
         scanf("%d",&num_ex);
 
