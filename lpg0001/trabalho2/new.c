@@ -4,13 +4,15 @@
 
 
 int main(void){
-    char *m;
+    printf("Qual a data do evento (dd/mm/aaaa)? ");
+    struct Data data_nova;
+    char* data_string=input_string(stdin);
 
-    printf("input string : ");
-    FILE* fp = fopen("agendas.txt","rt");
-    m = input_string(stdin);
-    printf("%s\n", m);
+    while (!data_str_valida(data_string,&data_nova)) {//Aqui ja salva na avaliacao do while
+        printf("Data invalida. Tente de novo: ");
+        char* data_string=input_string(stdin);
+    }
 
-    free(m);
+    free(data_string);
     return 0;
 }
