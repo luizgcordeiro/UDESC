@@ -114,24 +114,24 @@ int compara_Data(struct Data d1, struct Data d2) {
         >0 se d1 e apos d2; 0 se d1==d2; <0 se d2 e apos d1
     */
    
-    //Primeiro, vamos garantir que a data d2 e antes da d1
-    if (d2.ano>d1.ano) {
-        return -compara_Data(d2,d1);
-    }
-    if (d2.mes>d1.mes) {
-        return -compara_Data(d2,d1);
-    }
-    if (d2.dia>d1.dia) {
+    /*
+        Primeiro, vamos garantir que a data d2 e antes da d1
+        Isso pode ser feito do seguinte modo:
+        d2.dia-d1.dia da a diferenca entre os dias de d2 e d1
+        similarmente para o mes
+        Para fazer a diferenca do mes ganhar, multiplica por 31
+        Similarmente para o ano
+    */
+
+
+    if (372*(d2.ano-d1.ano)+31*(d2.mes-d1.mes)+d2.dia-d1.dia>0) {
         return -compara_Data(d2,d1);
     }
 
     //Agora, d2 e antes de d1.
     int dif_minutos=0;
     //Fazemos uma copia de d2 e passamos de dia a dia
-    struct Data copia;
-    copia.dia=d2.dia;
-    copia.mes=d2.mes;
-    copia.ano=d2.ano;
+    struct Data copia=d2;
 
     while ( (copia.dia != d1.dia) || (copia.mes != d1.mes) || (copia.ano != d1.ano) ) {
         dif_minutos+=1440;//=24*60
@@ -381,8 +381,6 @@ void imprime_descricao (char* str, int tamanho_maximo) {
     }
 }
 
-
-
 void imprime_local (char* str, int tamanho_maximo) {
     /*
         Imprime a local de um evento de um modo bonitinho
@@ -399,4 +397,31 @@ void imprime_local (char* str, int tamanho_maximo) {
             i++;
         }
     }
+}
+
+int e_substring (char * sub, char * str) {
+    /*
+        Determina se sub e uma substring de string
+    */
+
+    if (sub[0]==0) {
+        return 1;
+    }
+    int i=0,j=0,k;
+    for (i=0;str[i]!=0;i++) {
+        if (str[i]==sub[0]) {
+            k=1;
+            while (sub[k]!=0 && str[i+k]!=0) {
+                if (str[i+k]==sub[k]) {
+                    k++;
+                } else {
+                    break;
+                }
+            }
+            if (sub[k]==0) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
