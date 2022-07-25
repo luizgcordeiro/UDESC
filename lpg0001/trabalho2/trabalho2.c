@@ -34,13 +34,16 @@ int main() {
     );
 
     
-    int i;//Indices
+    int i,j;//Indices
     int opcao;//opcoes gerais
     char c;
+
+    int comprimento_de_linha=40;
 
     //Abre o arquivo com os nomes das agendas salvas
     FILE* agendas = fopen( "agendas.save", "rb");
     char* nome_agenda_atual;
+    int indice_agenda_atual;
     int numero_de_agendas;
     char** lista_de_agendas;
     int comp_nome_agenda;
@@ -126,6 +129,7 @@ int main() {
 
     if (opcao!=0) {
         nome_agenda_atual=lista_de_agendas[opcao-1];
+        indice_agenda_atual=opcao-1;
     }
     else {//opcao==0
         //Poe espaco para mais um nome.
@@ -175,7 +179,8 @@ int main() {
         }
         //Para quando lista_de_agendas[i]<nome_agenda_atual (pensa que lista_de_agendas[-1]=-infinity)
 
-        lista_de_agendas[i+1]=nome_agenda_atual;
+        indice_agenda_atual=i+1;//Bom gravar para caso tenha que deletar.
+        lista_de_agendas[indice_agenda_atual]=nome_agenda_atual;
     
         //Vamos regravar o arquivo de agendas
 
@@ -232,10 +237,8 @@ int main() {
         numero_de_eventos=0;
         fclose(arquivo_agenda_atual);
     }
-    else {
-        printf(
-            "Carregando a agenda...\n"
-        );
+    else {        
+        printf("Abrindo a agenda...\n");
         //A agenda existe
         //Vamos pegar a primeira linha, que tem o numero de eventos salvas.
         fread(&numero_de_eventos,sizeof(int),1,arquivo_agenda_atual);
@@ -308,10 +311,11 @@ int main() {
                 "  0. Mostrar as opcoes.\n"
                 "  1. Cadastrar um novo evento.\n"
                 "  2. Mostrar todos os eventos.\n"
-                "  3. Mostrar todos os eventos de uma data.\n"
+                "  3. Filtrar eventos por data.\n"
                 "  4. Filtrar eventos por descricao.\n"
                 "  5. Remover um evento.\n"
-                "  6. Salvar alteracoes e sair.\n"
+                "  6. Sair.\n"
+                "  7. Excluir esta agenda e sair.\n"
             );
 
             printf("Opcao: ");
@@ -367,13 +371,11 @@ int main() {
                 printf("Qual o horario de fim do evento (hh:mm)? ");
                 horario_string=input_string(stdin);
                 horario_valido=Horario_str_valido(horario_string,&evento_novo.fim);
-
                 while (!horario_valido) {
                     printf("Horario invalido. Tente de novo: ");
                     horario_string=input_string(stdin);
                     horario_valido=Horario_str_valido(horario_string,&evento_novo.fim);
                 }
-
                 if (compara_Horario(evento_novo.fim,evento_novo.inicio)>0) {
                     break;
                 }
@@ -386,12 +388,11 @@ int main() {
             data_valida=1;
             if (numero_de_eventos>0) {//Verifica se o evento e alocavel por busca binaria
                 //Vamos guardar o resultado na variavel "data_valida" (que ja esta declarada)
-                //Verifica se o evento e anterior ao primeiro evento
+                //Verifica se o evento novo comeca antes do primeiro evento
                 int left=0,right=numero_de_eventos-1,m;
                 if (compara_Evento(evento_novo,lista_de_eventos[0])<=0) {
                     //Se o evento novo comeca antes do primeiro
                     if (compara_Data(evento_novo.data,lista_de_eventos[0].data)+compara_Horario(evento_novo.fim,lista_de_eventos[0].inicio)>0) {
-                        printf("1");
                         data_valida=0;
                     } else {
                         data_valida=1;
@@ -399,7 +400,6 @@ int main() {
                 } else if (compara_Evento(evento_novo,lista_de_eventos[numero_de_eventos-1])>=0) {
                     //Se o evento novo comeca depois do ultimo
                     if (compara_Data(evento_novo.data,lista_de_eventos[numero_de_eventos-1].data)+compara_Horario(evento_novo.inicio,lista_de_eventos[numero_de_eventos-1].fim)<0) {
-                        printf("2");
                         data_valida=0;
                     } else {
                         data_valida=1;
@@ -420,11 +420,9 @@ int main() {
                     //left esta estritamente a esquerda do novo. O maior indice com essa propriedade e 'left'
                     if (compara_Data(evento_novo.data,lista_de_eventos[left].data)+compara_Horario(evento_novo.inicio,lista_de_eventos[left].fim)<0) {
                         //Se o evento novo comecar antes do fim do anterior
-                        printf("3");
                         data_valida=0;
                     } else if (compara_Data(evento_novo.data,lista_de_eventos[right].data)+compara_Horario(evento_novo.fim,lista_de_eventos[right].inicio)>0) {
                         //Se o evento novo terminar depois do comeco do proximo
-                        printf("4");
                         data_valida=0;
                     } else {
                         //Caso nada disso acontaca,
@@ -467,59 +465,320 @@ int main() {
             }
         }
         else if (opcao==2) {
-
-            for (i=0;i<numero_de_eventos;i++) {
-                int comprimento_de_linha=40,j;//Fica bonzinho
-                printf("Evento %d:\n",i+1);
-                char* temp=data_para_texto(lista_de_eventos[i].data);
-                printf("  Data: %s\n",temp);
-                free(temp);
-                temp=horario_para_texto(lista_de_eventos[i].inicio);
-                printf("  Inicio: %s\n",temp);
-                free(temp);
-                temp=horario_para_texto(lista_de_eventos[i].fim);
-                printf("  Fim: %s\n",temp);
-                free(temp);
-                imprime_descricao(lista_de_eventos[i].desc,comprimento_de_linha);
-                printf("\n");
-                imprime_local(lista_de_eventos[i].local,comprimento_de_linha);
-                printf("\n");
-                if (i<numero_de_eventos-1) {
-                    for (j=0;j<comprimento_de_linha;j++) {
-                        printf("-");
-                    }
+            if (numero_de_eventos==0) {
+                printf("Nao ha eventos para visualizar.");
+            } else {
+                for (i=0;i<numero_de_eventos;i++) {
+                    printf("Evento %d:\n",i+1);
+                    char* temp=data_para_texto(lista_de_eventos[i].data);
+                    printf("  Data: %s\n",temp);
+                    free(temp);
+                    temp=horario_para_texto(lista_de_eventos[i].inicio);
+                    printf("  Inicio: %s\n",temp);
+                    free(temp);
+                    temp=horario_para_texto(lista_de_eventos[i].fim);
+                    printf("  Fim: %s\n",temp);
+                    free(temp);
+                    imprime_descricao(lista_de_eventos[i].desc,comprimento_de_linha);
                     printf("\n");
+                    imprime_local(lista_de_eventos[i].local,comprimento_de_linha);
+                    printf("\n");
+                    if (i<numero_de_eventos-1) {
+                        for (j=0;j<comprimento_de_linha;j++) {
+                            printf("-");
+                        }
+                        printf("\n");
+                    }
                 }
             }
         }
         else if (opcao==3) {
+            if (numero_de_eventos==0) {
+                printf("Nao ha evento para visualizar.\n");
+            } else {
+
+                printf("Qual a data dos eventos que voce quer visualizar (dd/mm/aaaa)? ");
+                char* data_string=input_string(stdin);
+                struct Data data_a_procurar;
+                int data_valida=Data_str_valida(data_string,&data_a_procurar);
+
+                while (!data_valida) {
+                    printf("Data invalida. Tente de novo: ");
+                    data_string=input_string(stdin);
+                    data_valida=Data_str_valida(data_string,&data_a_procurar);
+                }
+
+                //Pesquisa binaria pela data (mais facil, ja que estamos de fato procurando uma data)
+                //Se for antes da primeira ou depois da ultima, quebra
+                if (compara_Data(data_a_procurar,lista_de_eventos[0].data)<0 || compara_Data(data_a_procurar,lista_de_eventos[numero_de_eventos-1].data)>0) {
+                    printf("\nNao ha eventos nesta data.\n");
+                } else {//busca binaria
+                    int left=0,right=numero_de_eventos-1,m;
+                    while (left<=right) {
+                        m=(left+right)/2;
+                        if (compara_Data(data_a_procurar,lista_de_eventos[m].data)>0) {
+                            left=m+1;
+                        } else if (compara_Data(data_a_procurar,lista_de_eventos[m].data)<0) {
+                            right=m-1;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    //m tem a possivel data encontrada
+
+                    if (compara_Data(data_a_procurar,lista_de_eventos[m].data)==0) {
+                        //Se achou a data.
+                        char* temp=data_para_texto(data_a_procurar);
+                        printf("\nEventos de %s:\n\n",temp);
+                        free(temp);
+                        //Faz uma busca sequencial para baixo para achar a primeira entrada com essa data
+                        while (m>0) {//Aqui, sei la se precisa de fato fazer esse loop para
+                            //a comparacao no if abaixo nao dar problema. Mas certamente funciona.
+                            if (compara_Data(data_a_procurar,lista_de_eventos[m-1].data)==0) {
+                                m--;
+                            } else {
+                                break;
+                            }
+                        }
+                        int eventos_mostrados=0;
+                        while (m<numero_de_eventos) {//Mesmas consideracoes que acima
+                            if (compara_Data(data_a_procurar,lista_de_eventos[m].data)==0) {
+                                if (eventos_mostrados>=1) {
+                                    for (j=0;j<comprimento_de_linha;j++) {
+                                        printf("-");
+                                    }
+                                    printf("\n");
+                                }
+                                //Exibe o evento
+                                printf("Evento %d:\n",eventos_mostrados+1);
+                                temp=horario_para_texto(lista_de_eventos[m].inicio);
+                                printf("  Inicio: %s\n",temp);
+                                free(temp);
+                                temp=horario_para_texto(lista_de_eventos[m].fim);
+                                printf("  Fim: %s\n",temp);
+                                free(temp);
+                                imprime_descricao(lista_de_eventos[m].desc,comprimento_de_linha);
+                                printf("\n");
+                                imprime_local(lista_de_eventos[m].local,comprimento_de_linha);
+                                printf("\n");
+                                
+                                eventos_mostrados++;
+                                m++;
+                            } else {
+                                break;
+                            }
+                        }
+                    } else {
+                        printf("\nNao ha eventos nesta data.\n");
+                    }
+
+                }
+
+                free(data_string);
+            }
         }
         else if (opcao==4) {
+            if (numero_de_eventos==0) {
+                printf("Nao ha evento para visualizar.\n");
+            } else {
+                printf("Qual texto voce quer procurar na descricao?\n");
+                char *descricao_a_procurar=input_string(stdin), *temp;
+                int eventos_mostrados=0;
+                for (i=0;i<numero_de_eventos;i++) {
+                    if (e_substring(descricao_a_procurar,lista_de_eventos[i].desc)) {
+                        if (eventos_mostrados>=1) {
+                            for (j=0;j<comprimento_de_linha;j++) {
+                                printf("-");
+                            }
+                            printf("\n");
+                        }
+                        //Exibe o evento
+                        printf("Evento %d:\n",eventos_mostrados+1);
+                        temp=horario_para_texto(lista_de_eventos[i].inicio);
+                        printf("  Inicio: %s\n",temp);
+                        free(temp);
+                        temp=horario_para_texto(lista_de_eventos[i].fim);
+                        printf("  Fim: %s\n",temp);
+                        free(temp);
+                        imprime_descricao(lista_de_eventos[i].desc,comprimento_de_linha);
+                        printf("\n");
+                        imprime_local(lista_de_eventos[i].local,comprimento_de_linha);
+                        printf("\n");
+                        
+                        eventos_mostrados++;
+                    }
+                }
+                free(descricao_a_procurar);
+
+                if (eventos_mostrados==0) {
+                    printf("Nao ha eventos em essa descricao.\n");
+                }
+            }  
         }
         else if (opcao==5) {
+            if (numero_de_eventos==0) {
+                printf("Nao ha evento para excluir.\n");
+            } else {
+
+                printf("Qual a data do evento que voce quer excluir (dd/mm/aaaa)? ");
+                char* data_string=input_string(stdin);
+                struct Evento evento_a_excluir;
+                int data_valida=Data_str_valida(data_string,&evento_a_excluir.data);
+
+                while (!data_valida) {
+                    printf("Data invalida. Tente de novo: ");
+                    data_string=input_string(stdin);
+                    data_valida=Data_str_valida(data_string,&evento_a_excluir.data);
+                }
+                
+
+                free(data_string);
+
+                //Pesquisa binaria pela data (mais facil, ja que estamos de fato procurando uma data)
+                //Se for antes da primeira ou depois da ultima, quebra
+                if (compara_Data(evento_a_excluir.data,lista_de_eventos[0].data)<0 || compara_Data(evento_a_excluir.data,lista_de_eventos[numero_de_eventos-1].data)>0) {
+                    printf("Nao ha eventos nesta data.\n");
+                } else {//busca binaria
+                    int left=0,right=numero_de_eventos-1,m;
+                    while (left<=right) {
+                        m=(left+right)/2;
+                        if (compara_Data(evento_a_excluir.data,lista_de_eventos[m].data)>0) {
+                            left=m+1;
+                        } else if (compara_Data(evento_a_excluir.data,lista_de_eventos[m].data)<0) {
+                            right=m-1;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    //m tem a possivel data encontrada
+
+                    if (compara_Data(evento_a_excluir.data,lista_de_eventos[m].data)==0) {
+                        //Neste caso, achou um evento com essa data, no indice m
+                        //Pede o horario de inicio do evento.
+                        printf("Qual o horario de inicio do evento a excluir (hh:mm)? ");
+                        char *horario_string=input_string(stdin);
+                        int horario_valido=Horario_str_valido(horario_string,&evento_a_excluir.inicio);
+                        
+                        while (!horario_valido) {
+                            printf("Horario invalido. Tente de novo: ");
+                            horario_string=input_string(stdin);
+                            horario_valido=Horario_str_valido(horario_string,&evento_a_excluir.inicio);
+                        }
+
+                        free(horario_string);
+                        //Continuamos a busca binaria
+                        if (compara_Evento(evento_a_excluir,lista_de_eventos[0])<0 || compara_Evento(evento_a_excluir,lista_de_eventos[numero_de_eventos-1])>0) {
+                            printf("Nao ha um evento nesta data e horario.\n");
+                        } else {
+                            //Ja tem left e right em posicoes boas
+                            while (left<=right) {
+                                m=(left+right)/2;
+                                if (compara_Evento(evento_a_excluir,lista_de_eventos[m])>0) {
+                                    left=m+1;
+                                } else if (compara_Evento(evento_a_excluir,lista_de_eventos[m])<0) {
+                                    right=m-1;
+                                } else {
+                                    break;
+                                }
+                            }
+
+                            if (compara_Evento(evento_a_excluir,lista_de_eventos[m])==0) {
+                                printf("Excluindo evento...\n");
+                                while (m<numero_de_eventos-1) {
+                                    lista_de_eventos[m]=lista_de_eventos[m+1];
+                                    m++;
+                                }
+                                numero_de_eventos--;
+                                lista_de_eventos=realloc(lista_de_eventos,sizeof(struct Evento)*(numero_de_eventos));
+                            } else {
+                                printf("Nao ha um evento nesta data e horario.\n");
+                            }
+                        }
+
+                    }
+                }
+            }
         }
         else if (opcao==6) {
-            FILE* arquivo_agenda_atual=fopen(endereco_agenda,"wb");
-            fwrite(&numero_de_eventos,sizeof(int),1,arquivo_agenda_atual);//numero de eventos
-            //Salva os eventos
-            for(i=0;i<numero_de_eventos;i++) {
-                fwrite(&lista_de_eventos[i].data,sizeof(struct Data),1,arquivo_agenda_atual);
-                fwrite(&lista_de_eventos[i].inicio,sizeof(struct Horario),1,arquivo_agenda_atual);
-                fwrite(&lista_de_eventos[i].fim,sizeof(struct Horario),1,arquivo_agenda_atual);
-                fwrite(&lista_de_eventos[i].comp_desc,sizeof(int),1,arquivo_agenda_atual);
-                fwrite(lista_de_eventos[i].desc,sizeof(char),lista_de_eventos[i].comp_desc,arquivo_agenda_atual);
-                fwrite(&lista_de_eventos[i].comp_local,sizeof(int),1,arquivo_agenda_atual);
-                fwrite(lista_de_eventos[i].local,sizeof(char),lista_de_eventos[i].comp_local,arquivo_agenda_atual);
+            printf("Voce quer salvar as alteracoes (S/N)? ");
+            char* salvar=input_string(stdin);
+
+            if (strcmp(salvar,"S")==0) {
+                printf("Salvando as alteracoes...");
+                FILE* arquivo_agenda_atual=fopen(endereco_agenda,"wb");
+                fwrite(&numero_de_eventos,sizeof(int),1,arquivo_agenda_atual);//numero de eventos
+                //Salva os eventos
+                for(i=0;i<numero_de_eventos;i++) {
+                    fwrite(&lista_de_eventos[i].data,sizeof(struct Data),1,arquivo_agenda_atual);
+                    fwrite(&lista_de_eventos[i].inicio,sizeof(struct Horario),1,arquivo_agenda_atual);
+                    fwrite(&lista_de_eventos[i].fim,sizeof(struct Horario),1,arquivo_agenda_atual);
+                    fwrite(&lista_de_eventos[i].comp_desc,sizeof(int),1,arquivo_agenda_atual);
+                    fwrite(lista_de_eventos[i].desc,sizeof(char),lista_de_eventos[i].comp_desc,arquivo_agenda_atual);
+                    fwrite(&lista_de_eventos[i].comp_local,sizeof(int),1,arquivo_agenda_atual);
+                    fwrite(lista_de_eventos[i].local,sizeof(char),lista_de_eventos[i].comp_local,arquivo_agenda_atual);
+                }
+                fclose(arquivo_agenda_atual);
+
+                free(salvar);
+                break;
+            } else if (strcmp(salvar,"N")==0) {
+                break;
+            } else {
+                printf("Opcao invalida.\n");
             }
 
-            fclose(arquivo_agenda_atual);
+            free(salvar);
+            
             break;
         }
-        else {
-            printf("Opcao invalida!\n");
+        else if (opcao==7) {
+            printf("Voce tem certeza de que quer excluir esta agenda (S/N)? ");
+            
+            char* excluir=input_string(stdin);
+            if (strcmp(excluir,"S")==0) {
+                printf("Excluindo a agenda \"%s\"...\n",nome_agenda_atual);
+                //Tenteir usar remove() mas nao consegui na subpasta sem o endereço completo do arquivo...
+                //Por isso, so limpamos o arquivo....
+                
+                FILE* arquivo_agenda_atual=fopen(endereco_agenda,"w");
+                i=0;
+                fwrite(&i,sizeof(int),1,arquivo_agenda_atual);
+                fclose(arquivo_agenda_atual);
+
+                //Atualiza a lista de agendas
+                for (i=indice_agenda_atual ; i<numero_de_agendas-1 ; i++) {
+                    lista_de_agendas[i]=lista_de_agendas[i+1];
+                }
+                
+                numero_de_agendas--;
+                //Pode fazer, mas nao precisa
+                //lista_de_agendas=realloc(numero_de_agendas*(sizeof(str*)));
+
+                agendas=fopen("agendas.save","wb");
+                fwrite(&numero_de_agendas,sizeof(int),1,agendas);
+                for (i=0;i<numero_de_agendas;i++) {
+                    comp_nome_agenda=strlen_meu(lista_de_agendas[i]);
+                    fwrite(&comp_nome_agenda,sizeof(int),1,agendas);
+                    fwrite(lista_de_agendas[i],sizeof(char),comp_nome_agenda+1,agendas);
+                }
+
+                fclose(agendas);
+        
+                free(excluir);
+                break;
+            } else if (strcmp(excluir,"N")==0) {
+                printf("A agenda \"%s\" sera mantida.\n",nome_agenda_atual);
+            } else {
+                printf("Opcao invalida.\n");
+            }
+
+            free(excluir);
         }
 
         barras();
+
         printf("Pressione ENTER para mostrar as opcoes.");
         c=getchar();
         /*
