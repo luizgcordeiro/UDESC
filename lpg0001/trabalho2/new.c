@@ -3,14 +3,11 @@
 #include "dep_trabalho2.h"
 
 
-int main(void){
-    char *m;
-
-    printf("input string : ");
-    FILE* fp = fopen("agendas.txt","rt");
-    m = input_string(stdin);
-    printf("%s\n", m);
-
-    free(m);
+int main(int argc, char* argv[]) {
+    printf("%s",argv[1]);
+    printf("\n");
+    printf("%s",argv[2]);
+    printf("\n");
+    printf("%d",e_substring(argv[1],argv[2]));
     return 0;
 }
