@@ -704,7 +704,7 @@ int main() {
         else if (opcao==6) {
             printf("Voce quer salvar as alteracoes (S/N)? ");
             char* salvar=input_string(stdin);
-
+            printf("%s",salvar);
             if (strcmp(salvar,"S")==0) {
                 printf("Salvando as alteracoes...");
                 FILE* arquivo_agenda_atual=fopen(endereco_agenda,"wb");
@@ -724,6 +724,7 @@ int main() {
                 free(salvar);
                 break;
             } else if (strcmp(salvar,"N")==0) {
+                free(salvar);
                 break;
             } else {
                 printf("Opcao invalida.\n");

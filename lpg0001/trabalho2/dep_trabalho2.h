@@ -255,7 +255,6 @@ char* input_string(FILE* stream){
         c=fgetc(stream);
     }
     str[comp]='\0';
-    comp++;
     str=realloc(str, sizeof(char)*(comp+1));
 
     return str;
