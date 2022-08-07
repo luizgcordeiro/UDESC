@@ -4,10 +4,9 @@
 
 
 int main(int argc, char* argv[]) {
-    printf("%s",argv[1]);
-    printf("\n");
-    printf("%s",argv[2]);
-    printf("\n");
-    printf("%d",e_substring(argv[1],argv[2]));
+    printf("Input a string");
+    char* str = input_string(stdin);
+    printf("%s",str);
+    free(str);
     return 0;
 }
