@@ -47,6 +47,7 @@ int main() {
     int numero_de_agendas;
     char** lista_de_agendas;
     int comp_nome_agenda;
+    int criando_nova_agenda=1;
 
     int numero_de_eventos;
     struct Evento* lista_de_eventos;
@@ -60,7 +61,7 @@ int main() {
         lista_de_agendas=malloc(0);//lista vazia
         opcao=0;//Para criar uma nova agenda
         numero_de_agendas=0;
-        fclose(agendas);
+        //fclose(agendas);
     }
     else {
         //O arquivo de agendas existe.
@@ -130,6 +131,7 @@ int main() {
     if (opcao!=0) {
         nome_agenda_atual=lista_de_agendas[opcao-1];
         indice_agenda_atual=opcao-1;
+        criando_nova_agenda=0;
     }
     else {//opcao==0
         //Poe espaco para mais um nome.
@@ -200,7 +202,10 @@ int main() {
             fwrite(lista_de_agendas[i],sizeof(char),comp_nome_agenda+1,agendas);
         }
 
-        fclose(agendas);
+        if (agendas!=NULL) {
+            fclose(agendas);
+        }
+        
     }
     
 
@@ -235,7 +240,7 @@ int main() {
             "Gerando um novo arquivo.\n"
         );
         numero_de_eventos=0;
-        fclose(arquivo_agenda_atual);
+        //fclose(arquivo_agenda_atual);
     }
     else {        
         printf("Abrindo a agenda...\n");
@@ -286,7 +291,9 @@ int main() {
         //tem que readicionar
     }
     
-    //fclose(arquivo_agenda_atual);
+    if (arquivo_agenda_atual!=NULL) {
+        fclose(arquivo_agenda_atual);
+    }
     //tem que readicionar
 
     opcao=0;
@@ -380,7 +387,7 @@ int main() {
                     break;
                 }
 
-                printf("\nO inicio do evento deve antecedeer o seu fim. Escolha novos horarios.\n\n");
+                printf("\nO inicio do evento deve anteceder o seu fim. Escolha novos horarios.\n\n");
             }
 
             free(horario_string);
@@ -466,7 +473,7 @@ int main() {
         }
         else if (opcao==2) {
             if (numero_de_eventos==0) {
-                printf("Nao ha eventos para visualizar.");
+                printf("Nao ha eventos para visualizar.\n");
             } else {
                 for (i=0;i<numero_de_eventos;i++) {
                     printf("Evento %d:\n",i+1);
@@ -704,9 +711,8 @@ int main() {
         else if (opcao==6) {
             printf("Voce quer salvar as alteracoes (S/N)? ");
             char* salvar=input_string(stdin);
-            printf("%s",salvar);
             if (strcmp(salvar,"S")==0) {
-                printf("Salvando as alteracoes...");
+                printf("Salvando as alteracoes...\n");
                 FILE* arquivo_agenda_atual=fopen(endereco_agenda,"wb");
                 fwrite(&numero_de_eventos,sizeof(int),1,arquivo_agenda_atual);//numero de eventos
                 //Salva os eventos
@@ -728,11 +734,8 @@ int main() {
                 break;
             } else {
                 printf("Opcao invalida.\n");
+                free(salvar);
             }
-
-            free(salvar);
-            
-            break;
         }
         else if (opcao==7) {
             printf("Voce tem certeza de que quer excluir esta agenda (S/N)? ");
@@ -743,7 +746,7 @@ int main() {
                 //Tenteir usar remove() mas nao consegui na subpasta sem o endereço completo do arquivo...
                 //Por isso, so limpamos o arquivo....
                 
-                FILE* arquivo_agenda_atual=fopen(endereco_agenda,"w");
+                FILE* arquivo_agenda_atual=fopen(endereco_agenda,"wb");
                 i=0;
                 fwrite(&i,sizeof(int),1,arquivo_agenda_atual);
                 fclose(arquivo_agenda_atual);
@@ -792,14 +795,16 @@ int main() {
         opcao=0;//Mostra as opcoes de novo
     }
     
-
+    
     //A agenda atual existe a ja foi selecionada.
     //A lista de agendas pode ser limpada
     for (i=0;i<numero_de_agendas;i++) {
         free(lista_de_agendas[i]);
     }
     free(lista_de_agendas);
-    free(nome_agenda_atual);
+    if (criando_nova_agenda) {
+        free(nome_agenda_atual);
+    }
     free(endereco_agenda);
     
     for(i=0;i<numero_de_eventos;i++) {
@@ -810,3 +815,11 @@ int main() {
     return 0;
 }
 
+
+
+/*
+    Comentários:
+    GCC no Linux da pau quando tenta fechar arquivo NULL
+
+    idem dar free numa variável fora da heap
+*/
