@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//include <stdarg.h> // function arguments
+//#include <stdarg.h> // function arguments
+//#include <math.h> // math
 //#include <string.h>
 
 void * _memcpy ( void * destination , void * source , size_t size ) {
@@ -14,9 +15,9 @@ void * _memcpy ( void * destination , void * source , size_t size ) {
 void swap ( void * A, void * B , size_t size) {
     //Swaps whatever is being pointed to by A and B, n being the size of the data in bytes.
     unsigned char temp[size];
-    memcpy(temp,A,size);
-    memcpy(A,B,size);
-    memcpy(B,temp,size);
+    _memcpy(temp,A,size);
+    _memcpy(A,B,size);
+    _memcpy(B,temp,size);
 };
 
 int max_int( int a , int b) {
