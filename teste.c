@@ -18,7 +18,3 @@ int main(int argc, char **argv) {
     printf("%d",max(a,b));
     return 0;
 }
-
-i=2
-
-i++
