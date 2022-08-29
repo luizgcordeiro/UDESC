@@ -241,9 +241,8 @@ char* input_string(FILE* stream){
     int alocacao=16;//"Blocos" de alocacao. 16 arbitrario
     char *str= malloc(sizeof(char)*(alocacao+1));//Aloca uma area dea tamanho 16+1
     int comp = 0;//Comprimento ja gravado
-    int c=fgetc(stream);//Pega o primeiro caracter da stream;
-    
-    while( c!=EOF && c != '\n'){
+    int c=getc(stream);//Pega o primeiro caracter da stream;
+    while( c != '\n' && c!=EOF && c!=0){
         str[comp]=c;
         comp++;
         //Alocamos mais um caracter.
@@ -254,6 +253,7 @@ char* input_string(FILE* stream){
         }
         c=fgetc(stream);
     }
+    
     str[comp]='\0';
     str=realloc(str, sizeof(char)*(comp+1));
 
