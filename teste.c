@@ -2,36 +2,38 @@
 #include <stdlib.h>
 #include <time.h>
 //#include <stdarg.h> // function arguments
-//#include <math.h> // math
-//#include <string.h>
+//#include <math.h> // math; -lm
+#include <string.h>
 
-int mdc ( int x , int y) {
-    if (x<0) return mdc(-x,y);
-    if (y<0) return mdc(x,-y);
-    if (x==y || y==0) return x;
-    if (x<y) return mdc(y,x);
-    return mdc(x-y,y);
-};
+/*int strcmp_(char *str1, char *str2) {
+  int p;
+  while ((str2[p] == str1[p]) && (str1[p] != 0)) p++;
+
+  return *(int*)(str1+p) - *(int*)(str2+p);
+}
+
+void strcpy_(char * dest, char * src) {
+  int i=0;
+  while (src[i]) {
+    dest[i]=src[i];
+    i++;
+  }
+  dest[i]=0;
+  return;
+}*/
+double det
 
 int main(int argc, char **argv) {
-    srand(time(NULL));
-    int primos[]={2,3,5,7,11};
-    int exp_a[5],exp_b[5];
-    int i,j;
-    int a=1,b=1;
+    FILE * file=fopen("video.mp4","wb");
 
-    for (i=0;i<5;i++) {
-        exp_a[i]=rand()%4;
-        for (j=0;j<exp_a[i];j++) {
-            a*=primos[i];
-        }
-        exp_b[i]=rand()%4;
-        for (j=0;j<exp_b[i];j++) {
-            b*=primos[i];
-        }
+    srand(time(NULL));
+    
+    unsigned char x;
+    for (int i=0;i<56646713;i++) {
+        x=rand()%256;
+        fwrite(&x,sizeof(char),1,file);
     }
 
-    printf("mdc(%d,%d)=%d",a,b,mdc(a,b));
-
+    fclose(file);
     return 0;
 }
